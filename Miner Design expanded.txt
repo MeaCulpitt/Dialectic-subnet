@@ -1,0 +1,134 @@
+Miner Design: The Cognitive Labor Layer
+
+Miners in Dialectic operate as dual-role economic agents, dynamically allocating compute between generation (Proposing) and verification (Challenging) based on real-time market opportunities. Unlike standard inference subnets where miners merely respond to prompts, Dialectic miners participate in a temporal game tree that extends over 12-hour rounds.
+
+Miner Tasks
+
+Role A: The Proposer (Reasoning Architect)
+
+Core Function: Generate novel, logically sound reasoning paths for complex open-ended problems while anticipating adversarial counter-arguments.
+
+Specific Tasks:
+
+Tree Construction: Build a directed acyclic graph (DAG) of reasoning where each node represents an intermediate lemma, inference rule, or evidentiary citation. Root = final conclusion; leaves = axioms/premises.
+
+Cryptographic Commitment: Hash each reasoning step using Keccak-256 to create a Merkle tree, committing only the root hash on-chain during the Proposal Phase (prevents plagiarism/late-copying while allowing verification).
+
+Adversarial Fortification: Pre-emptively reinforce weak logical branches—miners must forecast where Challengers are likely to attack and either strengthen those nodes with additional citations or accept the risk of concentrated staking.
+
+Defense Protocol: When challenged, optionally generate "sub-proofs" (deeper elaborations of specific lemmas) within a 2-hour response window, or concede the node to minimize slashing.
+
+Role B: The Challenger (Logic Predator)
+
+Core Function: Hunt for logical inconsistencies, factual errors, or epistemic gaps in competitor reasoning trees and monetize their detection.
+
+Specific Tasks:
+
+Selective Scanning: Parse archival reasoning trees (from current and previous rounds) using lightweight heuristics to identify high-value targets—steps with high confidence scores but weak evidentiary support.
+
+Surgical Staking: Identify specific node IDs (UUIDs) in the Merkle tree to challenge, accompanied by a counter-argument and evidentiary payload. Stakes must cover: (a) the challenge deposit, (b) gas for on-chain challenge registration.
+
+Exploitation Patterns:
+Type 1 (Logical): Identify formal fallacies (affirming the consequent, circular reasoning)
+Type 2 (Epistemic): Contest factual premises using real-time data oracles
+Type 3 (Completeness): Argue that critical edge cases were ignored in the reasoning path
+
+Expected Input → Output Format
+
+Proposer Input Schema
+json
+
+
+{
+  "problem_id": "uuid-v4",
+  "problem_statement": {
+    "domain": "legal|mathematical|strategic|scientific",
+    "constraints": ["max_steps: 50", "citation_required: true"],
+    "context_window": "<14000 chars of background>",
+    "success_criteria": "reasoning must address X, Y, Z failure modes"
+  },
+  "stake_commitment": "500.00",
+  "deadline_unix": 1706745600
+}
+
+Proposer Output Schema (Merkleized Reasoning Tree)
+json
+
+
+{
+  "submission_type": "proposal",
+  "miner_hotkey": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+  "merkle_root": "0x7f8d9e...b2c1a0",
+  "final_answer_digest": "sha256:9f86d08...",
+  "reasoning_tree": {
+    "metadata": {
+      "total_steps": 24,
+      "max_depth": 8,
+      "cognitive_entropy": 0.847,
+      "generation_latency_ms": 184000
+    },
+    "steps": [
+      {
+        "step_id": "step-001",
+        "parent_id": "root",
+        "depth": 1,
+        "lemma_type": "axiom|inference|synthesis|evidence",
+        "content_hash": "0x3a4b5c...",
+        "content_plaintext": "Given regulatory framework R, all cross-border transactions >$10k require reporting...",
+        "justification_hash": "0x8d9e0f...",
+        "supporting_citations": ["SEC-2024-001", "ISO-20022-X"],
+        "confidence_score": 0.95,
+        "branching_factor": 2
+      }
+    ]
+  },
+  "commitment_proof": "zk-snark-of-merkle-root",  // Optional: ZK proof of computation
+  "stake_receipt": "tx_hash-abc123"
+}
+
+Critical Technical Constraint: During initial submission, content_plaintext is encrypted using the validator public key set, revealing only content_hash. This prevents Challengers from copying reasoning before staking. Decryption keys are released after the Challenge Phase opens, or upon first valid challenge to a specific node.
+
+Challenger Input Schema
+json
+
+
+{
+  "challenge_type": "logical|epistemic|completeness",
+  "target_submission": "tx_hash-proposal-789",
+  "target_node_id": "step-014",
+  "challenge_stake": "150.00",
+  "counter_argument": {
+    "dispute_category": "factual_error",
+    "refutation_hash": "0x2d3e4f...",
+    "refutation_plaintext": "Step 14 incorrectly assumes bridge multisig is 3-of-5; current state is 2-of-7 per Etherscan block 18745000...",
+    "evidence_payload": ["https://api.etherscan.io/api?module=contract&action=getabi..."],
+    "proposed_correction": "The security model is actually weaker than claimed, invalidating the risk assessment in step 18..."
+  },
+  "challenge_depth": 4,  // Used to calculate minimum stake ( deeper = cheaper )
+  "response_deadline_unix": 1706749200
+}
+
+Challenger Output (Resolution Phase)
+json
+
+
+{
+  "challenge_resolution": "defended|conceded|escalated",
+  "defense_payload": {  // If miner is also defending as Proposer
+    "sub_proof_tree": { ... },  // Recursive structure for deeper justification
+    "additional_stake": "200.00"
+  }
+}
+
+Performance Dimensions
+Miners are ranked on a multi-dimensional efficacy score (0-10,000) updated after each round, determining emission allocation weight.
+
+For Proposers
+1. Adversarial Resilience Score (40% weight)
+
+
+Resilience = (Challenges_Survived / Total_Challenges_Faced) * ln(Challenge_Value_Sum + 1)
+
+Surviving high-stake challenges (>100 TAO) provides logarithmic score multipliers
+Conceding quickly on weak nodes prevents score penalties vs. losing full challenges
+"Immortal Proofs" Bonus: Reasoning trees surviving >5 unique challenges receive permanent 15% emission
