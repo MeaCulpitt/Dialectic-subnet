@@ -27,8 +27,8 @@ Where:
   [Capped at 2.0x for "Bulletproof" reasoning surviving >5 challengers]
 - Depth_Premium = ln(Avg_Reasoning_Depth) / ln(10) 
   [Rewards complex multi-step logic over shallow chains]
-Economic Example:
 
+Economic Example:
 Alice submits a 20-step legal analysis (Depth: 20)
 Survives challenges from 4 unique miners worth 400 TAO total
 Bob submits a 5-step analysis (Depth: 5)
@@ -66,12 +66,14 @@ Reward_Multiplier = Base × (0.95^Hours_Elapsed_Since_Challenge_Open)
 Challengers earn 5% less per hour they wait to file. This prevents "vulture challenges" where miners wait for validators to signal consensus, then pile on. Early detection of flaws is heavily rewarded.
 
 4. Validator Reward Mechanics: Calibration Markets
+
 Validators are paid for accuracy of judgment, not volume of verification.
 
 The Scoring Function:
 
 
 Validator_Score = (Calibration × 0.60) + (Throughput × 0.25) + (Novelty × 0.15)
+
 Calibration (60% weight):
 
 
@@ -128,4 +130,5 @@ At this threshold, the network is paying for its own security through utility, n
 Sybil Resistance:
 
 Stake-Weighted Expertise: Challenger rewards require minimum 100 TAO staked for 7 days before claiming "Critical Bonuses" (prevents churn-and-burn sock puppets)
+
 **
