@@ -1,0 +1,180 @@
+High-Level Algorithm: The Adversarial Consensus Protocol (ACP)
+
+The following describes the state machine and economic flow of a single Dialectic round, from task ingestion to final reward distribution.
+
+Phase 0: Task Inception & Assignment
+State Initialization:
+
+python
+
+
+Round_State = {
+    "round_id": hash(block_height + subnet_uid),
+    "task_pool": [],
+    "phase": "ASSIGNMENT",
+    "timestamp_start": now(),
+    "stake_pool": 0 TAO
+}
+Algorithm:
+
+Task Submission:
+Client (external or internal oracle) submits Task with:
+problem_statement (encrypted blob or IPFS hash)
+bounty (min 10 TAO, locked in escrow)
+difficulty scalar (D: 1-10, set by validator quorum based on historical solve rates)
+domain_tag (legal|mathematical|strategic|scientific)
+Validator Curation:
+Top 21 validators by stake-weight form the Assignment Committee
+They execute Fisher-Yates Shuffle seeded by round_id to randomly assign tasks to miners
+Prevents task-front-running (miners cannot predict which task they'll receive to pre-compute)
+Min-Max Allocation:
+Each miner receives 1-3 tasks based on their Reputation_Score (RS):
+RS < 100: 1 task
+100 ≤ RS < 500: 2 tasks
+RS ≥ 500: 3 tasks
+Constraint: No two miners receive identical task sets (prevents copy-paste attacks)
+Output: Task_Assignment_Map (miner_hotkey → task_id)
+
+Phase 1: Commitment (The Proposal Window)
+Duration: 6 hours (modifiable by governance)
+
+Miner Actions:
+
+python
+
+
+def submit_proposal(task_id, reasoning_tree, stake_amount):
+    # Input validation
+    assert stake_amount >= MIN_STAKE[D]  # Difficulty-scaled minimum (10-1000 TAO)
+    assert tree_depth >= 5  # MVC check
+    
+    # Cryptographic commitment
+    merkle_root = compute_merkle_root(reasoning_tree)
+    commitment_hash = keccak256(merkle_root + recent_block_hash + nonce)
+    
+    # State update
+    Round_State.proposals[miner] = {
+        "commitment": commitment_hash,
+        "stake": stake_amount,
+        "timestamp": now(),
+        "status": "COMMITTED",  # Content remains encrypted/off-chain
+        "task_id": task_id
+    }
+    Round_State.stake_pool += stake_amount
+Anti-Front-Running:
+
+Miners submit only commitment_hash (80 bytes), not the plaintext
+Prevents challengers from inspecting reasoning before staking
+Prevents plagiarism (cannot copy Merkle root without knowing preimage)
+Timeout Penalty:
+
+If now() > deadline and status ≠ "COMMITTED":
+Miner loses 5% of proposed stake (griefing penalty for wasting task slot)
+Task returns to pool for reassignment
+Phase 2: Adversarial Challenge (The Combat Window)
+Duration: 6 hours
+
+State Transition: COMMITTED → REVEALED (automatic at phase start)
+
+Reveal Mechanism:
+
+Miners must publish full reasoning_tree (IPFS/Arweave hash) within 30 minutes of phase start
+Failure to reveal = automatic slash of 50% stake (commitment defaults to invalid)
+Challenger Algorithm:
+
+python
+
+
+def submit_challenge(target_proposal, target_node_id, counter_argument, challenge_stake):
+    # Economic constraints
+    assert challenge_stake >= CHALLENGE_FLOOR[D][target_node.depth]  # Depth-tiered pricing
+    assert challenger_hotkey != target_proposal.miner_hotkey  # No self-challenge
+    
+    # Structural validation
+    assert target_node_id exists in target_proposal.tree
+    assert counter_argument.length >= MIN_CHARS  # Anti-spam
+    
+    # State update
+    Challenge = {
+        "id": uuid(),
+        "challenger": challenger_hotkey,
+        "target": target_proposal.miner,
+        "node_id": target_node_id,
+        "stake": challenge_stake,
+        "argument_hash": hash(counter_argument),
+        "timestamp": now(),
+        "status": "PENDING"
+    }
+    
+    # Escrow logic
+    lock_tao(challenger_hotkey, challenge_stake)
+    target_proposal.locked_stake += challenge_stake  # Proposer's reward potential frozen
+Temporal Decay (Anti-Sniping):
+
+python
+
+
+Challenge.reward_multiplier = 1.0 * (0.95 ** hours_elapsed_since_phase_start)
+Challenges in Hour 1: 100% potential reward
+Challenges in Hour 6: ~74% potential reward
+The Defense Protocol (Hours 6-8):
+
+Proposer Response Window: 2 hours to submit defense_subtree or CONCEDE
+If CONCEDE: Immediate settlement, 30% of proposer stake to challenger, 70% returned (early termination)
+If DEFEND: Recursive Merkle node attached to challenged branch, extending tree depth
+Phase 3: Stochastic Validation (Adjudication)
+Duration: 4 hours
+
+Validator Sampling Algorithm:
+
+python
+
+
+def validator_duty(validator_hotkey, stake_weight):
+    # 1. Random Branch Assignment (Verifiable Random Function)
+    vrf_seed = VRF(validator_private_key, round_id + challenge_id)
+    branches_to_check = sample_tree_branches(
+        tree=target_proposal.reasoning_tree,
+        k=ceil(log2(tree_size)),  # O(log n) sampling
+        seed=vrf_seed
+    )
+    
+    # 2. Logical Verification (Lite LLM + Formal Methods)
+    scores = []
+    for branch in branches_to_check:
+        coherence_score = NLI_model(branch.parent, branch.child)  # Entailment check
+        factual_score = oracle_check(branch.citations)  # External data validation
+        logic_score = SMT_solver(branch.proposition) if formal else heuristic_check
+        
+        scores.append(weighted_average(coherence, factual, logic))
+    
+    # 3. Consensus Formation (Quadratic Voting)
+    vote_confidence = sqrt(validator_stake) / total_sqrt_stake
+    submit_vote(
+        challenge_id=challenge.id,
+        verdict="PROPOSER_WINS" | "CHALLENGER_WINS",
+        confidence=mean(scores),
+        proof_hash=hash(verification_trace)  # ZK-proof placeholder
+    )
+Consensus Calculation:
+
+python
+
+
+def resolve_challenge(challenge):
+    votes = get_validator_votes(challenge.id)
+    
+    # Weighted by stake^{0.5} (quadratic voting)
+    proposer_weight = sum(sqrt(v.stake) for v in votes if v.verdict == "PROPOSER_WINS")
+    challenger_weight = sum(sqrt(v.stake) for v in votes if v.verdict == "CHALLENGER_WINS")
+    
+    total_weight = proposer_weight + challenger_weight
+    proposer_ratio = proposer_weight / total_weight
+    
+    if proposer_ratio > 0.67:
+        return "PROPOSER_WINS"
+    elif proposer_ratio < 0.33:
+        return "CHALLENGER_WINS"
+    else:
+        return "AMBIGUOUS"  # Triggers appeal court (top 10% validators only)
+**
