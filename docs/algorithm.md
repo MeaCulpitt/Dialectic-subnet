@@ -1,13 +1,14 @@
-High-Level Algorithm: The Adversarial Consensus Protocol (ACP)
+# High-Level Algorithm: The Adversarial Consensus Protocol (ACP)
 
 The following describes the state machine and economic flow of a single Dialectic round, from task ingestion to final reward distribution.
 
-Phase 0: Task Inception & Assignment
-State Initialization:
+---
 
-python
+## Phase 0: Task Inception & Assignment
 
+### State Initialization:
 
+```python
 Round_State = {
     "round_id": hash(block_height + subnet_uid),
     "task_pool": [],
@@ -15,34 +16,47 @@ Round_State = {
     "timestamp_start": now(),
     "stake_pool": 0 TAO
 }
-Algorithm:
-
-Task Submission:
-Client (external or internal oracle) submits Task with:
-problem_statement (encrypted blob or IPFS hash)
-bounty (min 10 TAO, locked in escrow)
-difficulty scalar (D: 1-10, set by validator quorum based on historical solve rates)
-domain_tag (legal|mathematical|strategic|scientific)
-Validator Curation:
-Top 21 validators by stake-weight form the Assignment Committee
-They execute Fisher-Yates Shuffle seeded by round_id to randomly assign tasks to miners
-Prevents task-front-running (miners cannot predict which task they'll receive to pre-compute)
-Min-Max Allocation:
-Each miner receives 1-3 tasks based on their Reputation_Score (RS):
-RS < 100: 1 task
-100 ≤ RS < 500: 2 tasks
-RS ≥ 500: 3 tasks
-Constraint: No two miners receive identical task sets (prevents copy-paste attacks)
-Output: Task_Assignment_Map (miner_hotkey → task_id)
-
-Phase 1: Commitment (The Proposal Window)
-Duration: 6 hours (modifiable by governance)
-
-Miner Actions:
-
-python
+```
 
 
+### Algorithm:
+
+#### Task Submission:
+
+Client (external or internal oracle) submits **Task** with:
+
+- `problem_statement` (encrypted blob or IPFS hash)
+- `bounty` (min 10 TAO, locked in escrow)
+- `difficulty` scalar (D: 1-10, set by validator quorum based on historical solve rates)
+- `domain_tag` (legal|mathematical|strategic|scientific)
+
+#### Validator Curation:
+
+- Top **21 validators** by stake-weight form the **Assignment Committee**
+- They execute **Fisher-Yates Shuffle** seeded by `round_id` to randomly assign tasks to miners
+- Prevents task-front-running (miners cannot predict which task they'll receive to pre-compute)
+
+#### Min-Max Allocation:
+
+Each miner receives **1-3 tasks** based on their `Reputation_Score` (RS):
+
+- **RS < 100:** 1 task
+- **100 ≤ RS < 500:** 2 tasks
+- **RS ≥ 500:** 3 tasks
+
+**Constraint:** No two miners receive identical task sets (prevents copy-paste attacks)
+
+**Output:** `Task_Assignment_Map` (miner_hotkey → task_id)
+
+---
+
+## Phase 1: Commitment (The Proposal Window)
+
+**Duration:** 6 hours (modifiable by governance)
+
+### Miner Actions:
+
+```python
 def submit_proposal(task_id, reasoning_tree, stake_amount):
     # Input validation
     assert stake_amount >= MIN_STAKE[D]  # Difficulty-scaled minimum (10-1000 TAO)
@@ -61,30 +75,37 @@ def submit_proposal(task_id, reasoning_tree, stake_amount):
         "task_id": task_id
     }
     Round_State.stake_pool += stake_amount
-Anti-Front-Running:
+```
 
-Miners submit only commitment_hash (80 bytes), not the plaintext
-Prevents challengers from inspecting reasoning before staking
-Prevents plagiarism (cannot copy Merkle root without knowing preimage)
-Timeout Penalty:
+### Anti-Front-Running:
 
-If now() > deadline and status ≠ "COMMITTED":
-Miner loses 5% of proposed stake (griefing penalty for wasting task slot)
-Task returns to pool for reassignment
-Phase 2: Adversarial Challenge (The Combat Window)
-Duration: 6 hours
+- Miners submit only `commitment_hash` (80 bytes), not the plaintext
+- Prevents challengers from inspecting reasoning before staking
+- Prevents plagiarism (cannot copy Merkle root without knowing preimage)
 
-State Transition: COMMITTED → REVEALED (automatic at phase start)
+### Timeout Penalty:
 
-Reveal Mechanism:
+If `now() > deadline` and `status ≠ "COMMITTED"`:
 
-Miners must publish full reasoning_tree (IPFS/Arweave hash) within 30 minutes of phase start
-Failure to reveal = automatic slash of 50% stake (commitment defaults to invalid)
-Challenger Algorithm:
+- Miner loses **5%** of proposed stake (griefing penalty for wasting task slot)
+- Task returns to pool for reassignment
 
-python
+---
 
+## Phase 2: Adversarial Challenge (The Combat Window)
 
+**Duration:** 6 hours
+
+**State Transition:** `COMMITTED` → `REVEALED` (automatic at phase start)
+
+### Reveal Mechanism:
+
+- Miners must publish full `reasoning_tree` (IPFS/Arweave hash) within **30 minutes** of phase start
+- Failure to reveal = automatic slash of **50% stake** (commitment defaults to invalid)
+
+### Challenger Algorithm:
+
+```python
 def submit_challenge(target_proposal, target_node_id, counter_argument, challenge_stake):
     # Economic constraints
     assert challenge_stake >= CHALLENGE_FLOOR[D][target_node.depth]  # Depth-tiered pricing
@@ -109,27 +130,34 @@ def submit_challenge(target_proposal, target_node_id, counter_argument, challeng
     # Escrow logic
     lock_tao(challenger_hotkey, challenge_stake)
     target_proposal.locked_stake += challenge_stake  # Proposer's reward potential frozen
-Temporal Decay (Anti-Sniping):
-
-python
+```
 
 
+### Temporal Decay (Anti-Sniping):
+
+```python
 Challenge.reward_multiplier = 1.0 * (0.95 ** hours_elapsed_since_phase_start)
-Challenges in Hour 1: 100% potential reward
-Challenges in Hour 6: ~74% potential reward
-The Defense Protocol (Hours 6-8):
+```
 
-Proposer Response Window: 2 hours to submit defense_subtree or CONCEDE
-If CONCEDE: Immediate settlement, 30% of proposer stake to challenger, 70% returned (early termination)
-If DEFEND: Recursive Merkle node attached to challenged branch, extending tree depth
-Phase 3: Stochastic Validation (Adjudication)
-Duration: 4 hours
+- Challenges in **Hour 1:** 100% potential reward
+- Challenges in **Hour 6:** ~74% potential reward
 
-Validator Sampling Algorithm:
+### The Defense Protocol (Hours 6-8):
 
-python
+**Proposer Response Window:** 2 hours to submit `defense_subtree` or `CONCEDE`
 
+- **If CONCEDE:** Immediate settlement, **30%** of proposer stake to challenger, **70%** returned (early termination)
+- **If DEFEND:** Recursive Merkle node attached to challenged branch, extending tree depth
 
+---
+
+## Phase 3: Stochastic Validation (Adjudication)
+
+**Duration:** 4 hours
+
+### Validator Sampling Algorithm:
+
+```python
 def validator_duty(validator_hotkey, stake_weight):
     # 1. Random Branch Assignment (Verifiable Random Function)
     vrf_seed = VRF(validator_private_key, round_id + challenge_id)
@@ -156,11 +184,11 @@ def validator_duty(validator_hotkey, stake_weight):
         confidence=mean(scores),
         proof_hash=hash(verification_trace)  # ZK-proof placeholder
     )
-Consensus Calculation:
+```
 
-python
+### Consensus Calculation:
 
-
+```python
 def resolve_challenge(challenge):
     votes = get_validator_votes(challenge.id)
     
@@ -177,4 +205,6 @@ def resolve_challenge(challenge):
         return "CHALLENGER_WINS"
     else:
         return "AMBIGUOUS"  # Triggers appeal court (top 10% validators only)
-**
+
+'''
+
