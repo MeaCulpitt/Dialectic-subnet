@@ -75,7 +75,7 @@ Dialectic can serve as the **"Subnet 0"** verification layer for other subnets:
 
 ### The Playing Field:
 
-| Category | Competitor Type | Weakness | Dialectic Advantage |
+| Category | Competitor Type | Weakness | Dialectic's Advantage |
 |----------|----------------|----------|---------------------|
 | **Centralized AI** | OpenAI o1, Claude, DeepSeek | Hidden reasoning; no 3rd party verification | Fully transparent Merkleized reasoning with open challenge mechanism |
 | **ZKML Subnets** | DSperse-type (computational proofs) | Verifies execution integrity, not logical correctness | Validates semantic/epistemic validity (does the logic actually hold?) |
@@ -167,3 +167,4 @@ Traditional platforms face cold-start problems attracting PhD-level experts. TAO
 ## Key Talking Point for Investors:
 
 **"While other subnets ask 'Is this computation correct?' or 'Is this prediction accurate?', Dialectic asks the harder question: 'Is this thinking sound?'—and we answer it by paying people to try to prove it's not."**
+
