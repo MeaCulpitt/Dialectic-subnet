@@ -16,7 +16,7 @@ Validators **do not** score full reasoning trees (computationally prohibitive). 
 
 #### The Scoring Function
 
-Validator_Score = (Calibration × 0.4) + (Efficiency × 0.3) + (Coverage × 0.3)
+**`Validator_Score = (Calibration × 0.4) + (Efficiency × 0.3) + (Coverage × 0.3)`**
 
 Where:
 
@@ -97,3 +97,4 @@ Three distinct validator tiers create a "**verification market**" where validato
     *Requirements: **Highest stake** / Rotation: **Monthly** (prevents stagnation)*
 
 **Result**: A decentralized verification marketplace where **economic rationality** enforces truth.
+
