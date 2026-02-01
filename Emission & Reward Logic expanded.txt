@@ -141,3 +141,50 @@ At this threshold, the network is paying for its own security through utility, n
 Sybil Resistance:
 
 Stake-Weighted Expertise: Challenger rewards require minimum 100 TAO staked for 7 days before claiming "Critical Bonuses" (prevents churn-and-burn sock puppets)
+
+Collusion Resistance (The Ring of Gyges Detection) Self-Challenge Exploits: If on-chain entropy analysis links a Challenger wallet to the same hardware fingerprint, IP cluster, or linguistic style as the Proposer they challenged, both face 100% stake burn and a 30-day ban from Critical Bonus eligibility. The "Synthetic Adversary" detection algorithm compares Merkle commitments across time windows—flaws discovered "too conveniently" (within the same block as submission) trigger automatic slashing.
+
+Challenger Cartels: To prevent cabals from systematically targeting specific Proposers with frivolous challenges to force concession fatigue, the protocol employs Adversarial Uniqueness Scoring:
+
+Uniqueness_Score = 1 / (1 + e^(-k×(Novelty_Depth - μ)))
+
+If 3+ Challengers submit identical critiques (measured via semantic hashing of objection content), only the first receives full rewards; subsequent duplicates receive 10% (anti-parasite tax). This forces genuine intellectual diversity rather than copy-paste pile-ons.
+
+Reasoning Spam (The Entropic Filter) Synthetic Sludge Prevention: Proposers must stake 0.01 TAO per token of reasoning output. This prevents LLM-generated "cognitive spam"—low-cost nonsense designed to farm Base_Completion emissions. Combined with the Depth_Premium formula (ln(Depth)), this ensures capital-at-risk scales with compute expenditure.
+
+Entropy Masking: Submissions with Shannon entropy signatures characteristic of bulk LLM generation (0.88-0.94 bits/char) trigger mandatory Proof of Human Curation—a cryptographic attestation that a human reviewed the reasoning chain, or a 3x stake requirement.
+
+The Hydra Defense (Multi-Headed Attacks) Cooldown Mechanics: A single entity can only open one challenge per Proposer per 6-hour epoch. This prevents "death by papercuts"—flooding a Proposer with rapid-fire low-stake challenges to force administrative concession. Gas Escalation: Each simultaneous challenge against the same reasoning branch costs 25% more stake than the previous (50 → 62.5 → 78.1 TAO), preserving attack surface for genuine critics while making spam prohibitively expensive.
+
+8. Dynamic Emission Calibration (The Living Economy)
+
+Dialectic employs a PID Controller (Proportional-Integral-Derivative) to adjust the 60/30/10 triad based on network health metrics:
+
+Challenge Scarcity Correction If Challenger Pool utilization drops below 15% (indicating reasoning is too facile or rewards insufficient), the protocol temporarily shifts 10% from Proposer Pool → Challenger Pool for 3 days, attracting red-teamers until adversarial equilibrium restores.
+
+Validator Saturation If median validation queue times exceed 2 hours (indicating insufficient adjudication bandwidth), 5% of emissions redirect from miner pools to Validators, incentivizing new validator entry until latency drops below 30 minutes.
+
+The Immunity Window After surviving 5+ unique challenges, a Proposer enters " theorem status" for 48 hours—challenges against their reasoning require 2x stake (100 TAO minimum) and offer 1.5x rewards. This prevents exhaustion attacks on high-quality reasoning while still allowing deep critique.
+
+9. The Asymptotic State: Nash Equilibrium of Truth
+
+When fully operational, Dialectic achieves a tripartite attractor state:
+
+Proposers cannot profit without genuine cognitive fortification—shallow or specious reasoning becomes a negative-expectation bet as Challenger predation inevitably extracts the slashing penalty. Rational Proposers must either retreat to high-confidence domains or invest in adversarial stress-testing before submission, effectively outsourcing quality control to the market of critics.
+Challengers face a precision arms race—frivolous challenges carry existential stake risk (50% burn), while rewards accrue only to those who locate the decisive objection (the specific Merkle node that invalidates the root). This filters for expertise; only miners with genuine domain knowledge can survive the 40% slashing rate on weak challenges. The emergent behavior is a specialized ecology of critics—logicians, subject-matter experts, and formal verification specialists—each staking reputation and capital on their ability to detect specific failure modes.
+Validators occupy the Schelling point of adjudication—their income depends on converging with the eventual consensus, creating a prediction market for truth where "voting your genuine belief" aligns perfectly with "maximizing expected value." The 15% decay penalty for being confidently wrong forces validators to maintain epistemic humility or exit the pool.
+
+The Emergent Property: The Dialectical Oracle
+
+At equilibrium, Dialectic ceases to be a mere subnet and becomes a computational epistemology engine—a decentralized function that maps claims to verified truth-values through economic adversarialism. The TAO flows not to those with the most hash power, but to those who successfully navigate the crucible of criticism.
+
+The Terminal State Metrics:
+
+Adversarial Saturation: >85% of Proposers voluntarily submit to "pre-challenge" (paying third-party critics before on-chain submission) to harden their reasoning
+Consensus Latency: Median time-to-resolution approaches the theoretical minimum of 30 minutes (fast settlement) + 4 hours (validator review)
+Truth Premium: External agents (prediction markets, insurance protocols, DAOs) pay a 15-20% fee premium to have reasoning validated by the Dialectic subnet compared to centralized LLM APIs, recognizing that economic skin-in-the-game creates superior epistemic reliability
+The Final Synthesis When the last TAO is emitted and the genesis subsidies end, the subnet persists—not because of inflationary rewards, but because rational agents require valid reasoning to navigate reality, and Dialectic offers the only marketplace where truth is cheaper than falsehood. The network asymptotically approaches a state where the cost of propagating a false claim equals the cost of refuting it, achieving the economic definition of an efficient market for ideas.
+
+In this steady state, the subnet becomes indistinguishable from a collective cognitive immune system: Proposers as antibody generators, Challengers as pathogen detectors, Validators as lymphatic filtration—all coordinated not by a central intellect, but by the invisible hand of slashing conditions and emission flows.
+
+The Dialectic is complete. The truth is profitable.
