@@ -1,0 +1,180 @@
+Emission & Reward Logic: The Economic Engine of Adversarial Truth
+
+Dialectic’s reward structure creates a zero-sum cognitive arena where TAO flows from flawed reasoning to valid criticism, with validators extracting rent for providing the arbitration layer.
+
+1. The Base Emission Architecture
+The 60/30/10 Triad From each block’s subnet emission (TAO/sec allocated by Yuma Consensus):
+
+60% → Proposer Pool (Reasoning Generation)
+30% → Challenger Pool (Adversarial Detection)
+10% → Validator Pool (Adjudication Services)
+Critical Distinction: Unlike standard subnets where miners compete for shared emissions based on performance scores, Dialectic operates a redistributive model where substantial portions of Proposer emissions are transferable to Challengers based on challenge outcomes.
+
+2. Proposer Reward Mechanics
+Base Rate Calculation
+
+
+Daily_Proposer_Emission = (Subnet_TAO_Emission × 0.60) × (Resilience_Score / ΣResilience_Scores)
+The Resilience Multiplier (R) The core scoring function for Proposers:
+
+
+R = Base_Completion × Survival_Bonus × Immortality_Factor × Depth_Premium
+
+Where:
+- Base_Completion = 0.1 for submitting valid Merkle root, 0 otherwise
+- Survival_Bonus = Σ(Challenge_Value_Survived / Challenge_Value_Total) for each round
+- Immortality_Factor = 1.0 + (0.15 × max(0, Unique_Challengers - 3)) 
+  [Capped at 2.0x for "Bulletproof" reasoning surviving >5 challengers]
+- Depth_Premium = ln(Avg_Reasoning_Depth) / ln(10) 
+  [Rewards complex multi-step logic over shallow chains]
+
+Economic Example:
+Alice submits a 20-step legal analysis (Depth: 20)
+Survives challenges from 4 unique miners worth 400 TAO total
+Bob submits a 5-step analysis (Depth: 5)
+Survives 1 challenge worth 50 TAO
+Alice receives ~4.2x the emission weight of Bob despite both "succeeding," incentivizing cognitive depth and adversarial fortification.
+
+The "Blood in the Water" Penalty: If a Proposer concedes a challenge within 30 minutes (indicating low confidence), they retain 70% of base emissions but forfeit 30% to the Challenger immediately, bypassing validator adjudication (fast settlement).
+
+3. Challenger Reward Mechanics: The Predatory Economy
+Jackpot Architecture Challengers profit via stake capture, not just emission share.
+
+Winning a Challenge:
+
+
+Challenger_Payout = (Proposer_Stake_Slashed × 0.40) 
+                    + (Challenge_Stake_Returned) 
+                    + (Valuation_Bonus)
+The Valuation Bonus: If a challenge reveals a critical flaw (defined as invalidating the root conclusion), the challenger receives a multiplier on the base emission pool:
+
+
+Critical_Bonus = (30% Pool_Emission × 0.10) / Number_of_Critical_Findings
+This creates "bug bounty" jackpots where finding a fatal logical error can yield 50-200 TAO in a single round.
+
+Challenge Staking Tiers:
+
+Depth 1-3 (Surface): 10 TAO minimum stake, 1.0x reward multiplier
+Depth 4-7 (Structural): 25 TAO minimum, 1.5x multiplier
+Depth 8+ (Foundational): 50 TAO minimum, 2.0x multiplier
+Economic Rationale: Deep challenges require more effort to verify but target more valuable flaws (potentially collapsing entire reasoning trees), justifying higher stakes and returns.
+
+Temporal Decay (Anti-Sniping):
+
+
+Reward_Multiplier = Base × (0.95^Hours_Elapsed_Since_Challenge_Open)
+Challengers earn 5% less per hour they wait to file. This prevents "vulture challenges" where miners wait for validators to signal consensus, then pile on. Early detection of flaws is heavily rewarded.
+
+4. Validator Reward Mechanics: Calibration Markets
+
+Validators are paid for accuracy of judgment, not volume of verification.
+
+The Scoring Function:
+
+
+Validator_Score = (Calibration × 0.60) + (Throughput × 0.25) + (Novelty × 0.15)
+
+Calibration (60% weight):
+
+
+Calibration = 1 - |Individual_Vote - Consensus_Result|^2
+If validator votes WITH the eventual >67% majority: +1.0 score
+If validator votes AGAINST strong consensus (>80% agreement): -2.0 score (heavy penalty for being confidently wrong)
+If validator abstains: 0.0 (neutral, but frequent abstention triggers "Lazy Validator" slashing)
+The Consensus Divergence Penalty: If a validator votes "Proposer Wins" but the consensus is "Challenger Wins" with >80% confidence:
+
+Immediate: Forfeit 5% of staked validator TAO to winning-side voters
+Persistent: Reputation score decays by 15% (affects future emission share for 7 days)
+This creates "Skin in the Game" for adjudication—validators must be accurate or lose capital.
+
+Throughput (25% weight): Validators must maintain a minimum verification rate (branches verified per hour) to prevent gaming by only voting on obvious cases.
+
+Novelty (15% weight): Validators receive bonuses for being among the first 20% to correctly identify "edge case" challenges (those with 40-60% initial consensus uncertainty), incentivizing expertise in ambiguous logical territories.
+
+5. Slashing & Redistribution Flows
+The TAO Cycle:
+
+Challenge Initiation: Challenger locks 50 TAO in escrow
+Adversarial Resolution:
+If Challenger Wins:
+40% of Proposer's staked emission goes to Challenger
+10% to Validators (as urgency bonus for swift adjudication)
+50% burned or returned to subnet treasury (deflationary mechanism)
+If Challenger Loses (frivolous challenge):
+50% of Challenger stake burned
+30% distributed to Proposer (pain compensation)
+20% to Validators (compensation for wasted verification compute)
+The Treasury Reinvestment: All burned TAO from slashing is redirected to a Subnet Treasury controlled by high-reputation validators, used for:
+
+Genesis Grants: Bootstrapping new miners (first 30 days subsidized)
+Bug Bounties: Rewards for finding exploits in the subnet mechanism itself
+Cross-Subnet Integration: Paying other subnets to pipe data into Dialectic
+6. Bootstrapping vs. Steady-State Economics
+Phase 1: Genesis (Months 1-6)
+
+Founder Subsidy: 25,000 TAO committed to guarantee minimum viable rewards
+Guaranteed Minimum: Proposers earn at least 2 TAO/day regardless of external demand
+Challenger Matching: Every challenge stake matched 1:1 by founder funds (doubles potential upside for early red-teamers)
+Phase 2: Organic (Month 6+)
+
+Fee Market Dominance: Client payments become >60% of total miner income
+Deflationary Pressure: As TAO price appreciates, challenge stakes automatically adjust downward in TAO terms (peg to $USD via oracle) to maintain accessibility
+Emission Saturation: Block rewards become "gravy" atop verification fees; subnet survives even if TAO emissions drop 90%
+The Sustainability Checkpoint: The subnet achieves economic escape velocity when:
+
+
+Daily_Client_Fees > (Daily_Emissions × 0.5)
+At this threshold, the network is paying for its own security through utility, not inflation.
+
+7. Anti-Gaming Safeguards
+Sybil Resistance:
+
+Stake-Weighted Expertise: Challenger rewards require minimum 100 TAO staked for 7 days before claiming "Critical Bonuses" (prevents churn-and-burn sock puppets)
+
+Collusion Resistance (The Ring of Gyges Detection) Self-Challenge Exploits: If on-chain entropy analysis links a Challenger wallet to the same hardware fingerprint, IP cluster, or linguistic style as the Proposer they challenged, both face 100% stake burn and a 30-day ban from Critical Bonus eligibility. The "Synthetic Adversary" detection algorithm compares Merkle commitments across time windows—flaws discovered "too conveniently" (within the same block as submission) trigger automatic slashing.
+
+Challenger Cartels: To prevent cabals from systematically targeting specific Proposers with frivolous challenges to force concession fatigue, the protocol employs Adversarial Uniqueness Scoring:
+
+Uniqueness_Score = 1 / (1 + e^(-k×(Novelty_Depth - μ)))
+
+If 3+ Challengers submit identical critiques (measured via semantic hashing of objection content), only the first receives full rewards; subsequent duplicates receive 10% (anti-parasite tax). This forces genuine intellectual diversity rather than copy-paste pile-ons.
+
+Reasoning Spam (The Entropic Filter) Synthetic Sludge Prevention: Proposers must stake 0.01 TAO per token of reasoning output. This prevents LLM-generated "cognitive spam"—low-cost nonsense designed to farm Base_Completion emissions. Combined with the Depth_Premium formula (ln(Depth)), this ensures capital-at-risk scales with compute expenditure.
+
+Entropy Masking: Submissions with Shannon entropy signatures characteristic of bulk LLM generation (0.88-0.94 bits/char) trigger mandatory Proof of Human Curation—a cryptographic attestation that a human reviewed the reasoning chain, or a 3x stake requirement.
+
+The Hydra Defense (Multi-Headed Attacks) Cooldown Mechanics: A single entity can only open one challenge per Proposer per 6-hour epoch. This prevents "death by papercuts"—flooding a Proposer with rapid-fire low-stake challenges to force administrative concession. Gas Escalation: Each simultaneous challenge against the same reasoning branch costs 25% more stake than the previous (50 → 62.5 → 78.1 TAO), preserving attack surface for genuine critics while making spam prohibitively expensive.
+
+8. Dynamic Emission Calibration (The Living Economy)
+
+Dialectic employs a PID Controller (Proportional-Integral-Derivative) to adjust the 60/30/10 triad based on network health metrics:
+
+Challenge Scarcity Correction If Challenger Pool utilization drops below 15% (indicating reasoning is too facile or rewards insufficient), the protocol temporarily shifts 10% from Proposer Pool → Challenger Pool for 3 days, attracting red-teamers until adversarial equilibrium restores.
+
+Validator Saturation If median validation queue times exceed 2 hours (indicating insufficient adjudication bandwidth), 5% of emissions redirect from miner pools to Validators, incentivizing new validator entry until latency drops below 30 minutes.
+
+The Immunity Window After surviving 5+ unique challenges, a Proposer enters " theorem status" for 48 hours—challenges against their reasoning require 2x stake (100 TAO minimum) and offer 1.5x rewards. This prevents exhaustion attacks on high-quality reasoning while still allowing deep critique.
+
+9. The Asymptotic State: Nash Equilibrium of Truth
+
+When fully operational, Dialectic achieves a tripartite attractor state:
+
+Proposers cannot profit without genuine cognitive fortification—shallow or specious reasoning becomes a negative-expectation bet as Challenger predation inevitably extracts the slashing penalty. Rational Proposers must either retreat to high-confidence domains or invest in adversarial stress-testing before submission, effectively outsourcing quality control to the market of critics.
+Challengers face a precision arms race—frivolous challenges carry existential stake risk (50% burn), while rewards accrue only to those who locate the decisive objection (the specific Merkle node that invalidates the root). This filters for expertise; only miners with genuine domain knowledge can survive the 40% slashing rate on weak challenges. The emergent behavior is a specialized ecology of critics—logicians, subject-matter experts, and formal verification specialists—each staking reputation and capital on their ability to detect specific failure modes.
+Validators occupy the Schelling point of adjudication—their income depends on converging with the eventual consensus, creating a prediction market for truth where "voting your genuine belief" aligns perfectly with "maximizing expected value." The 15% decay penalty for being confidently wrong forces validators to maintain epistemic humility or exit the pool.
+
+The Emergent Property: The Dialectical Oracle
+
+At equilibrium, Dialectic ceases to be a mere subnet and becomes a computational epistemology engine—a decentralized function that maps claims to verified truth-values through economic adversarialism. The TAO flows not to those with the most hash power, but to those who successfully navigate the crucible of criticism.
+
+The Terminal State Metrics:
+
+Adversarial Saturation: >85% of Proposers voluntarily submit to "pre-challenge" (paying third-party critics before on-chain submission) to harden their reasoning
+Consensus Latency: Median time-to-resolution approaches the theoretical minimum of 30 minutes (fast settlement) + 4 hours (validator review)
+Truth Premium: External agents (prediction markets, insurance protocols, DAOs) pay a 15-20% fee premium to have reasoning validated by the Dialectic subnet compared to centralized LLM APIs, recognizing that economic skin-in-the-game creates superior epistemic reliability
+The Final Synthesis When the last TAO is emitted and the genesis subsidies end, the subnet persists—not because of inflationary rewards, but because rational agents require valid reasoning to navigate reality, and Dialectic offers the only marketplace where truth is cheaper than falsehood. The network asymptotically approaches a state where the cost of propagating a false claim equals the cost of refuting it, achieving the economic definition of an efficient market for ideas.
+
+In this steady state, the subnet becomes indistinguishable from a collective cognitive immune system: Proposers as antibody generators, Challengers as pathogen detectors, Validators as lymphatic filtration—all coordinated not by a central intellect, but by the invisible hand of slashing conditions and emission flows.
+
+The Dialectic is complete. The truth is profitable.
+
