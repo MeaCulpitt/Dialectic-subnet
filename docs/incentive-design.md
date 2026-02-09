@@ -1,189 +1,258 @@
-# Incentive Alignment Architecture: Why They Play By The Rules
+# Mechanism Design
 
-Dialectic uses multi-period game theory and irreversible reputation staking to transform short-term exploiters into long-term truth-seekers. Here is the specific alignment logic for each actor.
-
----
-
-## Miner Alignment (Proposers & Challengers)
-
-### The Reputation Lock-In Mechanism
-
-**The Problem:** In standard subnets, miners can "hit-and-run"—extract emissions with low-quality work, deregister, and restart fresh.
-
-**The Solution: Cognitive Capital Accumulation**
-
-**`Effective_Emission_Rate = Base_Rate × (1 + ln(1 + Reputation_Score/100))`**
-
-**Reputation Score (RS):** Persists across subnet registrations (stored on Bittensor parent chain)
-
-**Growth Pattern:** Linear in effort, logarithmic in decay
-- **+10 RS** for surviving a high-stake challenge
-- **-2 RS** per day of inactivity (halving time: 35 days)
-
-**Permanence:** RS > 1000 grants **"Elder"** status—emission floor guarantees and governance rights
-
-**Alignment Effect:** A miner with RS=500 earns **6.2x** the TAO per unit of work vs. a new miner (RS=0). This creates exit friction—leaving the subnet destroys months of accumulated cognitive capital.
-
-### The Dual-Role Optimization
-
-Miners can act as Proposers in Round N and Challengers in Round N+1, creating a portfolio strategy.
-
-**The Kelly Criterion Allocation:** Rational miners optimize their capital allocation:
-
-- **High Reputation (RS>300):** Allocate **70%** to Proposing (stable income), **30%** to Challenging (high variance upside)
-- **Low Reputation:** Allocate **90%** to Challenging (asymmetric upside—find one critical bug → instant reputation boost)
-
-**Anti-Collusion Design:** Miners cannot challenge their own submissions (hotkey linking prevents Sybil masking). More critically, **Challenge Anonymity** ensures that even if Proposer A and Challenger B are friends, B cannot prove to A that they didn't challenge them—creating a trustless betrayal incentive.
-
-### Quality-Over-Quantity Binding
-
-**The Dilution Penalty:** Proposers submitting **>3 solutions per day** face cognitive entropy decay:
-
-**`Quality_Multiplier = max(0.5, 1 - (Submissions_Today - 3) × 0.15)`**
-
-- Fourth submission = **85%** emissions
-- Fifth = **70%**
-
-This prevents spam attacks that flood validators with noise.
-
-**Challenger Precision Incentives:** Challengers receive a **Discovery Premium** only for first valid challenge to a specific node. Subsequent challengers to the same flaw receive diminishing returns (**50%, 25%, 10%**), preventing "piggybacking" on others' research.
+This document covers Dialectic's game theory, incentive structure, and emission logic.
 
 ---
 
-## Validator Alignment: The Calibration Trap
+## Core Mechanism
 
-### The Informed Minority Problem
+Dialectic implements a three-party adversarial game:
 
-**The Risk:** Validators might lazily vote with the majority to avoid slashing, creating an information cascade where no one actually verifies.
+    ┌─────────────┐     submits      ┌─────────────────┐
+    │  Proposer   │ ───────────────► │  Reasoning Tree │
+    └─────────────┘                  └────────┬────────┘
+                                              │
+    ┌─────────────┐     attacks      ┌────────▼────────┐
+    │  Challenger │ ───────────────► │  Specific Node  │
+    └─────────────┘                  └────────┬────────┘
+                                              │
+    ┌─────────────┐   adjudicates    ┌────────▼────────┐
+    │  Validator  │ ───────────────► │    Verdict      │
+    └─────────────┘                  └─────────────────┘
 
-**The Solution: Private Scoring with Public Revelation**
-
-- Validators submit **encrypted votes** during the adjudication window (commit-reveal scheme)
-- Consensus is calculated **only after** the window closes
-- **Late Reveal Penalty:** Validators revealing after the deadline lose **50%** of rewards regardless of correctness
-
-**Alignment Effect:** You cannot see which way the wind is blowing before voting. You must independently verify or risk being wrong in a public vote.
-
-### The Calibration Gradient
-
-Validators are ranked on a **Brier Score** (probability calibration):
-
-**`Brier_Penalty = (Validator_Confidence - Consensus_Margin)²`**
-
-- If you vote **90% confident** but consensus is **51/49**, you are "overconfident" and penalized
-- If you vote **51% confident** but consensus is **90/10**, you are "underconfident" and penalized
-
-**Long-term Alignment:** Validators with poor calibration drift to the bottom of the weight distribution, eventually receiving **<1%** of validator emissions. They are phase-shifted out of the active set organically.
-
-### Hardware Commitment & Sunk Costs
-
-**Validator Tiers** create sticky capital:
-
-| Tier | Minimum Stake | Hardware Requirement | Lock Period | Exit Penalty |
-|------|---------------|---------------------|-------------|--------------|
-| Scout | 100 TAO | Consumer GPU (RTX 4090) | 7 days | 5% burn |
-| Auditor | 1,000 TAO | A100/H100 | 30 days | 10% burn |
-| Arbiter | 10,000 TAO | Multi-node cluster | 90 days | 20% burn |
-
-**Alignment Logic:** The **20% exit penalty** for Arbiters means they must believe the subnet will survive **>1 year** to recoup hardware costs. This filters for long-term aligned validators who actively improve protocol security rather than extract short-term MEV.
+Each role has distinct economic incentives aligned toward accurate reasoning.
 
 ---
 
-## Cross-Actor Alignment: The Virtuous Cycle
+## Emission Distribution
 
-### The Client-Miner-Validator Trilemma
+| Role | Share | Source |
+|------|-------|--------|
+| Proposers | 60% | Base emissions + unchallenged bonuses |
+| Challengers | 30% | Successful challenge rewards + bounties |
+| Validators | 10% | Adjudication fees + calibration bonuses |
 
-Traditional markets suffer from adverse selection: clients don't know quality, so they pay average prices, driving out high-quality providers.
+### Why 60/30/10?
 
-**Dialectic's Fix: Adversarial Certification as Collateral**
+**Proposers (60%):** The primary work product is reasoning. Higher share attracts quality contributors.
 
-- Proposers effectively post **collateral** (their stake) that Challengers can win
-- This collateral is **verifiable on-chain**, creating a bonding curve of trust
-- Clients pay **premium rates (2x base)** for reasoning with **>100 TAO** in challenged-but-survived collateral
+**Challengers (30%):** Adversarial pressure requires meaningful rewards, but challengers only add value when flaws exist. Lower share prevents challenge-farming.
 
-**Alignment:** Miners want high collateral at risk (signals quality) but need Challengers to test them (proves quality). Challengers want high-quality targets (bigger jackpots). Validators want high-stakes debates (higher fees). All three want expensive-looking, rigorous truth.
-
-### The "Doomsday" Scenario Resistance
-
-**Scenario:** A cartel of Proposers and Challengers collude to fake debates and split rewards.
-
-**Counter-Mechanisms:**
-
-1. **Independent Validation:** Validators are randomly selected from the global pool; cartel must corrupt **>67%** of stake-weighted validators to guarantee fake wins
-
-2. **Client Oracle Injection:** Enterprise clients can inject **"Canary Tasks"**—problems with known objectively correct answers. If the cartel gets these wrong (because they aren't actually verifying), they are slashed heavily (**-50% RS**)
-
-3. **Entropy Requirements:** Reasoning trees must contain novel cryptographic entropy (hashes of recent block headers) proving real-time computation, preventing replay of old debates
-
-### Temporal Consistency: The Multi-Game
-
-Dialectic is designed as an indefinitely repeated game with open boundaries:
-
-**`Lifetime_Value = Σ (Current_Emission × Discount_Rate^t) + (Exit_Liquidity_Value)`**
-
-Where **`Exit_Liquidity_Value = Reputation_Score × 0.1 TAO`**
-
-- **High Discount Rate (impatient miners):** Must extract maximum now, incentivizes low-effort spam
-  - **System Response:** High decay rate on reputation for low-quality work makes "maximum extraction" actually lower than "steady quality" over 6 months
-  - **Result:** Rational actors choose patience
+**Validators (10%):** Adjudication is essential but shouldn't be the profit center. Lower share keeps validators neutral.
 
 ---
 
-## Emergent Alignment: The Truth Premium
+## Staking Mechanics
 
-Ultimately, the subnet aligns all parties toward objective logical validity because:
+### Proposer Stakes
 
-- **For Proposers:** Only objectively valid reasoning survives challenges → Only survivors earn long-term reputation → Only reputation earns sustainable yield
-- **For Challengers:** Only objectively invalid reasoning can be profitably challenged → Must develop superior detection capability to find flaws before others → Capability requires understanding truth
-- **For Validators:** Only objectively correct adjudication maintains calibration → Miscalibration leads to exponential emission loss → Must accurately model truth to survive
+When submitting a reasoning tree:
 
-**The Nash Equilibrium:** All parties independently pursuing maximum TAO extraction converge on verifiable truth as the dominant strategy.
+| Tree Complexity | Minimum Stake | Maximum Stake |
+|-----------------|---------------|---------------|
+| Simple (1-5 nodes) | 10 TAO | 50 TAO |
+| Medium (6-20 nodes) | 25 TAO | 100 TAO |
+| Complex (21+ nodes) | 50 TAO | 250 TAO |
 
----
+Higher stakes signal confidence and attract proportionally higher rewards if unchallenged.
 
-## Visual Summary: The "Alignment Triangle"
+### Challenger Stakes
 
-The incentive architecture creates a stable equilibrium through three mutually reinforcing pressure vectors:
+To challenge a specific node:
 
-  Clients (Demand)
-       /\
-      /  \
-     /    \
-    /      \
-   /        \
-Miners (Supply) — Validators (Arbitration)
+| Challenge Type | Minimum Stake | Maximum Reward |
+|----------------|---------------|----------------|
+| Factual error | 5 TAO | 2x stake |
+| Logical fallacy | 10 TAO | 2.5x stake |
+| Missing context | 5 TAO | 1.5x stake |
+| Contradiction | 10 TAO | 3x stake |
 
+Challenger stake must be at least 10% of proposer's stake on the contested branch.
 
-**Vector 1: Client → Miner**
+### Validator Stakes
 
-Clients demand bulletproof reasoning. Miners supply it or get slashed. The **"Canary Task"** mechanism ensures clients can verify quality without trusting the subnet—if a miner fails a known-answer problem, they're economically ejected.
+Validators stake to participate in adjudication:
 
-**Vector 2: Miner → Validator**
+| Tier | Stake | Cases/Epoch | Weight |
+|------|-------|-------------|--------|
+| Scout | 100 TAO | Up to 10 | 1x |
+| Auditor | 500 TAO | Up to 50 | 2x |
+| Arbiter | 2,000 TAO | Unlimited | 5x |
 
-Miners need validators to recognize valid reasoning. Validators need miners to generate high-stakes challenges to justify their fees. The **Calibration Scoring** ensures validators must be accurate to survive, creating a "market for judgment" where only precise adjudicators earn recurring revenue.
-
-**Vector 3: Validator → Client**
-
-Validators implicitly guarantee the network's output quality. Clients pay premiums for this guarantee. The **"Result Insurance"** mechanism (200% refunds on failed validations) makes validators the ultimate backstop for client trust.
-
-### The Equilibrium Condition
-
-At the center of this triangle is **TAO**. Each actor must acquire and stake TAO to participate. As the subnet produces more verified truths, client demand increases, driving TAO price appreciation. This appreciation increases the value of:
-
-- Miner block rewards (higher $/TAO)
-- Validator staking yields (higher $/TAO)
-- Challenger jackpots (higher $/TAO)
-
-Thus, all three actors are **long TAO** and must protect the network's reputation for truthfulness to protect their own financial positions. This creates the **"Skin in the Game" Triangle**—a three-sided mutual hostage situation where defecting from honest play destroys one's own TAO holdings.
+Higher tiers receive more cases and more weight in disputed verdicts.
 
 ---
 
-## Conclusion: Why This Works
+## Reward Calculations
 
-Traditional AI safety relies on alignment through architecture (designing models that "want" to be helpful) or alignment through oversight (humans monitoring AI). Dialectic achieves **alignment through economics**—it doesn't ask participants to be good; it makes being good the only profitable strategy.
+### Unchallenged Proposer Reward
 
-Miners can't cheat because challengers are paid to catch them.
-Challengers can't spam because stakes are slashed for frivolous attacks.
-Validators can't collude because calibration scoring makes lazy voting economically suicidal.
-Clients can't free-ride because they must pay for quality or receive none.
-The result is a spontaneous order—a decentralized market that produces truth as a byproduct of rational self-interest. This is the "Adversarial Genesis" not just of a subnet, but of a new primitive: cryptographic truth certificates that can underpin the next generation of high-stakes AI applications.
+If a reasoning tree survives the challenge window:
+
+    reward = base_emission × (stake_weight / total_stakes) × quality_multiplier
+    
+    quality_multiplier = reputation_score × complexity_bonus × freshness
+
+**Example:** 
+- Proposer stakes 50 TAO on a medium-complexity tree
+- Total proposer stakes this epoch: 5,000 TAO
+- Reputation score: 1.2 (good history)
+- Complexity bonus: 1.15 (12 nodes)
+- Base emission: 100 TAO
+
+    reward = 100 × (50/5000) × (1.2 × 1.15) = 1.38 TAO
+
+### Successful Challenge Reward
+
+When a challenger wins:
+
+    challenger_reward = challenger_stake × reward_multiplier + proposer_slash
+    
+    proposer_slash = min(proposer_stake × 0.3, challenged_branch_stake)
+
+**Example:**
+- Challenger stakes 10 TAO on a logical fallacy (2.5x multiplier)
+- Proposer had staked 50 TAO total, 15 TAO on challenged branch
+
+    challenger_reward = (10 × 2.5) + (15 × 0.3) = 25 + 4.5 = 29.5 TAO
+
+The proposer loses 4.5 TAO plus reputation damage.
+
+### Failed Challenge Penalty
+
+When a challenge is rejected:
+
+    penalty = challenger_stake × 0.5
+    distribution = 60% to proposer, 30% to validators, 10% burned
+
+This prevents frivolous challenges while not being so punitive that legitimate challenges are deterred.
+
+---
+
+## Game Theory Analysis
+
+### Proposer Strategy
+
+**Optimal behavior:** Submit well-reasoned trees with appropriate stakes.
+
+- Understaking invites challenges (low downside for attackers)
+- Overstaking risks larger losses if flaws exist
+- Quality reasoning is the best defense
+
+**Equilibrium:** Proposers stake proportionally to their confidence and reasoning quality.
+
+### Challenger Strategy
+
+**Optimal behavior:** Challenge only when expected value is positive.
+
+    EV = P(win) × reward - P(lose) × penalty
+    
+    Challenge when EV > 0
+
+- Deep analysis before challenging is incentivized
+- Marginal challenges are filtered by stake requirements
+- High-reputation proposers are challenged less (higher P(lose))
+
+**Equilibrium:** Only substantive challenges are submitted.
+
+### Validator Strategy
+
+**Optimal behavior:** Judge accurately to maximize calibration score.
+
+Validators are scored on:
+1. Agreement with final consensus (after appeals)
+2. Speed of response
+3. Consistency across similar cases
+
+Poor calibration reduces case assignment and effective stake weight.
+
+---
+
+## Anti-Gaming Mechanisms
+
+### Collusion Prevention
+
+**Self-challenge detection:**
+- Statistical analysis of proposer-challenger pairs
+- Suspiciously correlated behavior triggers review
+- Penalty: Both parties slashed + reputation reset
+
+**Sybil resistance:**
+- Minimum stake requirements make Sybil attacks expensive
+- Reputation is per-key, not transferable
+- New accounts start with neutral (not high) reputation
+
+### Quality Inflation Prevention
+
+**Reputation decay:**
+- 5% decay per epoch for inactive participants
+- Recent performance weighted higher than historical
+- Prevents "rest on laurels" behavior
+
+**Difficulty adjustment:**
+- As average quality increases, challenge criteria tighten
+- Maintains adversarial pressure even in mature network
+
+### Validator Manipulation Prevention
+
+**Random assignment:**
+- Validators cannot choose which disputes to judge
+- Assignments weighted by tier and stake
+- No foreknowledge of which cases they'll receive
+
+**Calibration penalties:**
+- Validators who consistently deviate from consensus lose stake weight
+- Extreme outliers face escalating penalties
+- Prevents biased or captured validators
+
+---
+
+## Epoch Structure
+
+Each epoch runs on a 24-hour cycle:
+
+| Phase | Duration | Activity |
+|-------|----------|----------|
+| Submission | 0-18h | Proposers submit reasoning trees |
+| Challenge | 0-24h | Challengers can attack any tree (6h window per tree) |
+| Defense | Per challenge | 2h defense window after each challenge |
+| Adjudication | Rolling | Validators judge as disputes arise |
+| Settlement | 24h | Rewards and slashes distributed |
+
+Submissions and challenges overlap. A tree submitted at hour 10 can be challenged until hour 16.
+
+---
+
+## Upgrade Path
+
+### Phase 1: Launch
+- Conservative parameters (higher stakes, simpler trees)
+- Limited validator set (curated Arbiters)
+- Manual review of edge cases
+
+### Phase 2: Expansion
+- Stake requirements reduced based on observed behavior
+- Validator set opens to Scouts
+- Automated adjudication for clear-cut cases
+
+### Phase 3: Maturity
+- Full parameter governance by stakers
+- Cross-subnet integration (reasoning as a service)
+- Specialized domains (legal, scientific, financial)
+
+---
+
+## Parameter Governance
+
+After Phase 2, key parameters can be adjusted through governance:
+
+| Parameter | Adjustment Range | Vote Threshold |
+|-----------|------------------|----------------|
+| Emission split | ±10% per role | 66% of validator stake |
+| Minimum stakes | ±50% | 50% of total stake |
+| Challenge windows | ±2 hours | 50% of validator stake |
+| Slashing rates | ±10% | 75% of total stake |
+
+Changes require a 7-day notice period before implementation.
+
+---
