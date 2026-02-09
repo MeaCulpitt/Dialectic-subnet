@@ -13,6 +13,8 @@ Dialectic miners operate in two roles: **Proposers** (submit reasoning) and **Ch
 
 Miners can operate as one or both roles. Running both creates natural hedging but requires distinct skill sets.
 
+**Important:** A miner cannot challenge their own proposals. Self-challenges are rejected at the protocol level, and attempts to self-challenge via multiple accounts are detected through statistical analysis and result in slashing for both accounts.
+
 ---
 
 ## Proposer Implementation
@@ -135,6 +137,8 @@ Challengers receive recently-submitted trees for analysis:
         }
       ]
     }
+
+Note: Trees where the challenger's hotkey matches the proposer's hotkey are automatically excluded from the available set.
 
 ### Output: Challenge Submission
 
