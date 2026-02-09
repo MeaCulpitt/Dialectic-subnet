@@ -1,170 +1,239 @@
-# Business Logic & Market Rationale
+# Business Logic
+
+This document covers Dialectic's market positioning, competitive landscape, and value proposition.
 
 ---
 
-## The Problem & Why It Matters
+## Market Problem
 
-### The "Black Box" Crisis in High-Stakes AI Reasoning
+AI systems increasingly make high-stakes decisions: investment analysis, legal reasoning, governance proposals, security audits. The reasoning behind these decisions is often opaque and unverified.
 
-Current LLMs generate plausible-sounding but unverifiable outputs. In domains where errors cost millions (legal strategy, financial modeling, scientific peer review, smart contract auditing), organizations face an impossible choice: trust opaque AI reasoning or rely on slow, expensive human expert review.
+**Current verification approaches fail:**
 
-### Specific Pain Points:
+| Approach | What It Verifies | What It Misses |
+|----------|------------------|----------------|
+| Human review | Reasoning quality | Doesn't scale |
+| Consensus | Popular opinion | Popularity ≠ correctness |
+| ZKML | Computation executed correctly | Logic soundness |
+| Prediction markets | Outcome accuracy | The reasoning that produced it |
+| Inference consensus | Output consistency | Consistent errors |
 
-- **Hallucination Detection Lag:** Firms discover reasoning errors post-deployment (e.g., legal AI citing fake precedents, medical AI overlooking drug interactions), often too late for remediation
-
-- **Incentive Misalignment in Crowdsourcing:** Platforms like Amazon Mechanical Turk pay for volume, not quality; experts have no economic reason to deeply challenge flawed logic
-
-- **Centralized Verification Bottlenecks:** Big Tech safety teams (OpenAI, Anthropic) act as single points of failure and censorship, unable to scale to niche domain expertise (e.g., obscure tax law, rare disease pathology)
-
-**Market Validation:** The "AI Audit" market is projected at **$4.2B by 2027** (Gartner), yet no solution offers real-time adversarial verification at scale. Current enterprise contracts for AI risk assessment (**$50k–$500k per audit**) suggest willingness to pay for verifiable reasoning.
-
----
-
-## Technical Differentiation: Beyond ZKML and Prediction Markets
-
-Dialectic occupies a distinct niche from existing Bittensor subnets:
-
-### ZKML Verification Subnets (e.g., DSperse-type subnets)
-
-- **What they do:** Prove that a model executed correctly (computational integrity)
-- **The gap:** They verify that inference happened, not whether the reasoning makes logical sense
-- **Dialectic's edge:** We validate semantic coherence and logical entailment, not just cryptographic execution traces
-
-### Inference Aggregation Subnets (Text-generation subnets)
-
-- **What they do:** Route prompts to optimal LLMs and ensemble outputs for consensus
-- **The gap:** Collaborative filtering without economic stakes on disagreement—no "skin in the game" when miners disagree
-- **Dialectic's edge:** Explicit adversarial staking where challengers profit by proving logical flaws, not just offering alternative answers
-
-### Prediction Market Subnets
-
-- **What they do:** Stake on future outcomes (tabular data, time-series forecasting)
-- **The gap:** Focus on endpoint accuracy (was the price prediction correct?), not path validity (was the reasoning to reach that prediction sound?)
-- **Dialectic's edge:** We verify the cognitive process (Chain-of-Thought trees) not just the final prediction accuracy
-
-**Visual:** Venn diagram showing three overlapping circles (Computation, Consensus, Prediction) with Dialectic positioned at the intersection of "Adversarial Logic" and "Economic Verification."
+None verify that *the reasoning itself* is sound.
 
 ---
 
-## Bittensor Ecosystem Position: Filling the Verification Gap
+## Dialectic's Solution
 
-### The Subnet Stack:
+**Adversarial verification of reasoning quality.**
 
-- **Data Layer** (Pre-training subnets) — Provides training data
-- **Model Layer** (Fine-tuning subnets) — Provides specialized weights
-- **Inference Layer** (Text-generation subnets) — Provides raw outputs
-- **Verification Layer** (Dialectic) — Validates logical coherence of the above
+Instead of asking "is this answer correct?" Dialectic asks "can this reasoning withstand economically-motivated attack?"
 
-### Synergy Opportunity:
+The mechanism:
+1. Proposers submit structured reasoning with economic stake
+2. Challengers profit by finding flaws
+3. Validators adjudicate disputes
+4. Economic pressure drives quality
 
-Dialectic can serve as the **"Subnet 0"** verification layer for other subnets:
-
-- Text-generation subnets can pipe outputs through Dialectic for "adversarial certification" before delivery
-- ZKML subnets can verify compute; Dialectic verifies the logic within that compute
-- Prediction subnets can submit their feature-engineering reasoning for debate before finalizing bets
-
-### Revenue Share Model:
-
-**2% fee** on all cross-subnet verification calls creates a moat—as other subnets integrate Dialectic, they become dependent on our validator set for quality assurance.
-
-**Visual:** Stack diagram with Dialectic as the "Quality Control" layer sitting atop the inference and model layers, filtering outputs before they reach end-users.
+This creates a market for reasoning verification where truth-finding is incentive-compatible.
 
 ---
 
-## Competitive Landscape: White Space in Adversarial Verification
+## Competitive Landscape
 
-### The Playing Field:
+### vs. ZKML (EZKL, Modulus, Giza)
 
-| Category | Competitor Type | Weakness | Dialectic's Advantage |
-|----------|----------------|----------|---------------------|
-| **Centralized AI** | OpenAI o1, Claude, DeepSeek | Hidden reasoning; no 3rd party verification | Fully transparent Merkleized reasoning with open challenge mechanism |
-| **ZKML Subnets** | DSperse-type (computational proofs) | Verifies execution integrity, not logical correctness | Validates semantic/epistemic validity (does the logic actually hold?) |
-| **Inference Consensus** | Text-generation subnets | Output aggregation; no adversarial stakes | Explicit staking on disagreement—"proof of combat" for logic |
-| **Prediction Markets** | Numerai-style forecasting subnets | Rewards endpoint accuracy only | Rewards reasoning quality (survival of logic under attack) |
-| **Web2 Auditors** | CertiK, OpenZeppelin, Trail of Bits | Manual, $50k-$500k per audit, 3-week turnaround | Automated scaling: <$500 per analysis, 4-hour resolution via game theory |
-| **Debate Platforms** | Kaggle Forums, Gitcoin Debates | Unscalable human-only discussion; no compute augmentation | AI-accelerated verification with crypto-economic finality |
+| Dimension | ZKML | Dialectic |
+|-----------|------|-----------|
+| Verifies | Computation integrity | Reasoning quality |
+| Proves | "This model produced this output" | "This reasoning withstands scrutiny" |
+| Cost | High (ZK proving) | Lower (economic, not cryptographic) |
+| Scope | Narrow (specific models) | Broad (any structured reasoning) |
 
-### Defensibility:
+**Relationship:** Complementary. ZKML proves the computation; Dialectic proves the logic.
 
-Network effects in **"Red Team"** expertise. The subnet with the sharpest challengers attracts the most clients; the most client demand attracts the best challengers. Unlike ZKML subnets which commoditize proof-generation, Dialectic commoditizes critical thinking—a skill that improves with subnet age.
+### vs. Prediction Markets (Polymarket, Metaculus)
 
-**Visual:** 2x2 matrix: "Speed" vs. "Verification Depth."
+| Dimension | Prediction Markets | Dialectic |
+|-----------|-------------------|-----------|
+| Verifies | Outcome probability | Reasoning soundness |
+| Resolution | External events | Internal logic |
+| Timeline | Waits for outcomes | Immediate verification |
+| Value | "What will happen?" | "Is this analysis sound?" |
 
-- **Bottom-left:** Human auditing (slow, deep)
-- **Top-left:** ZKML subnets (fast, shallow—only checks computation)
-- **Bottom-right:** Prediction subnets (slow/epoch-based, shallow—only checks outcomes)
-- **Top-right (alone):** Dialectic (fast, deep—checks logical structure in real-time)
+**Relationship:** Different questions. Prediction markets verify outcomes; Dialectic verifies the reasoning used to predict them.
 
----
+### vs. Inference Subnets (SN1, SN18, etc.)
 
-## Why Bittensor Specifically?
+| Dimension | Inference Subnets | Dialectic |
+|-----------|-------------------|-----------|
+| Focus | Output generation | Output verification |
+| Scoring | Consistency/quality | Adversarial survival |
+| Role | Production | Assurance |
 
-### 1. Adversarial Incentive Engineering Requires Crypto-Economics
+**Relationship:** Complementary. Inference subnets produce reasoning; Dialectic stress-tests it.
 
-Traditional SAAS cannot credibly pay strangers to attack each other's outputs (legal liability, payment rail friction). TAO emissions enable:
+### vs. Audit Firms
 
-- **Permissionless Opposition:** Anyone globally can challenge reasoning without KYC or employment contracts
+| Dimension | Traditional Audits | Dialectic |
+|-----------|-------------------|-----------|
+| Model | Hired experts | Economic bounties |
+| Incentive | Reputation (weak) | Profit (strong) |
+| Coverage | Sampled | Continuous |
+| Speed | Weeks/months | Hours |
+| Cost | $50k-500k | Market-driven |
 
-- **Contingent Payment:** Challengers only earn if their critique is mathematically validated, impossible with fiat recurring billing
-
-### 2. Asymmetric Verification Advantage
-
-Bittensor's architecture naturally separates heavy generation (miners) from lightweight verification (validators). In Dialectic:
-
-- Miners expend **1000x compute** to generate proofs
-- Validators expend **10x compute** to verify via sampling
-
-This asymmetry mirrors Bitcoin's PoW but for cognitive labor—perfectly suited to Bittensor's weight-based emission distribution.
-
-### 3. Censorship-Resistance for Sensitive Domains
-
-Legal strategy, whistleblower analysis, and controversial scientific hypotheses require reasoning evaluation that centralized AI providers (OpenAI, Google) actively avoid due to brand risk. A decentralized subnet operates beyond single-jurisdiction content policies.
-
-### 4. Token Flywheel for Expertise Aggregation
-
-Traditional platforms face cold-start problems attracting PhD-level experts. TAO price appreciation creates a **"knowledge gold rush"** where early validators earn significant upside for establishing the subnet's reputation, bootstrapping high-quality adjudication that fiat-only markets cannot match.
+**Relationship:** Competitive for some use cases, complementary for others. Audits provide depth; Dialectic provides breadth and speed.
 
 ---
 
-## Path to Long-Term Adoption & Sustainability
+## Target Use Cases
 
-### Phase 1: Crypto-Native Use Cases (Months 0–12)
+### Tier 1: Immediate Value
 
-- **DeFi Protocol Governance:** Audit complex treasury allocation proposals (e.g., "Should we migrate liquidity to Protocol X?") before on-chain votes; Dialectic provides adversarial reports as due diligence
+**DeFi Governance**
+- Protocol proposals require structured justification
+- Challengers stress-test assumptions before votes
+- Reduces governance attacks and poorly-reasoned proposals
+- *Market size:* $50B+ in governed TVL
 
-- **Smart Contract Pre-Deployment:** Developers submit architecture reasoning; subnet identifies edge case vulnerabilities before code is written (cheaper than formal verification)
+**Smart Contract Security**
+- Audit reasoning submitted as trees
+- Economic incentive to find what auditors missed
+- Continuous post-deployment monitoring
+- *Market size:* $500M+ annual audit spend
 
-**Revenue Model:** 0.5% TAO fee on challenge stakes + API access fees paid in TAO/Stablecoins
+### Tier 2: Near-Term Expansion
 
-### Phase 2: Enterprise Integration (Months 12–24)
+**Legal Analysis**
+- Contract interpretation with explicit logic
+- Adversarial review before execution
+- Regulatory compliance reasoning
+- *Market size:* Legal AI market $15B by 2027
 
-- **Legal Tech Partnerships:** Integration with Harvey/Casetext competitors; law firms use Dialectic to stress-test briefs before filing (billable "AI Red Team Review")
+**Investment Research**
+- Structured investment theses
+- Adversarial due diligence
+- Track record verification
+- *Market size:* Research spend $30B+ annually
 
-- **Pharmaceutical Pipeline Analysis:** Biotech firms submit drug interaction hypotheses; subnet adversaries identify failure modes missed by internal teams
+### Tier 3: Long-Term Vision
 
-**Sustainability Mechanism:** Enterprises subscribe to **"Reasoning Insurance"**—monthly retainers for priority verification slots, creating steady fiat revenue stream to buy TAO off-market for validator incentives
+**Scientific Reasoning**
+- Pre-publication adversarial review
+- Replication crisis mitigation
+- Structured methodology verification
 
-### Phase 3: Protocol Standardization (Year 2+)
-
-- **ZK-Proof of Reasoning:** Develop standard format where Dialectic-validated reasoning trees become portable credentials (NFTs representing "audit-grade logic")
-
-- **Regulatory Recognition:** SEC/FCA frameworks increasingly require "AI explainability"; Dialectic certificates become de facto compliance documentation for algorithmic decision-making systems
-
-- **Subnet Independence:** Transition from foundation subsidies to self-sustaining fee market where challenge stakes alone cover validator emissions (minimum viable emission threshold analysis suggests achievable at **$15M TAO market cap** with 500 daily challenges)
+**AI Alignment**
+- Verify AI reasoning chains
+- Adversarial testing of AI decisions
+- Human-AI collaboration verification
 
 ---
 
-## Risk Mitigation for Sustainability:
+## Value Proposition by Stakeholder
 
-- **Reputation Lock-In:** Enterprises accumulate historical verification records; switching costs increase as their proprietary reasoning datasets become embedded in the subnet's challenge history
+### For Proposers (Reasoning Producers)
 
-- **Defensive Moat:** Network effects favor the subnet with the most experienced challengers (sharpest critique); late entrants face "empty marketplace" problems impossible to overcome without massive capital injection
+- **Credibility:** Survived-challenge status is valuable signal
+- **Monetization:** Earn TAO for quality reasoning
+- **Improvement:** Challenges identify blind spots
+- **Track record:** Reputation accumulates over time
 
-- **Plausible Exit/Integration:** Acquisition interest from major audit firms (Deloitte, EY) seeking decentralized verification tech, or integration as Bittensor's canonical **"Subnet 0"** for logical validity across all other subnets
+### For Challengers (Adversarial Reviewers)
+
+- **Profit:** Earn by finding errors others miss
+- **Specialization:** Domain expertise becomes valuable
+- **Scalability:** Review many proposals, challenge few
+- **Independence:** No client relationships to manage
+
+### For Validators (Adjudicators)
+
+- **Yield:** Earn 10% of emissions for judgment
+- **Expertise monetization:** Domain knowledge → calibration → rewards
+- **Network effects:** More disputes → more opportunity
+
+### For End Users (Reasoning Consumers)
+
+- **Trust:** Adversarially-verified reasoning is more reliable
+- **Efficiency:** Skip manual review for survived-challenge content
+- **Auditability:** Full dispute history available
+- **Price discovery:** Market determines verification cost
 
 ---
 
-## Key Talking Point for Investors:
+## Revenue Model
 
-**"While other subnets ask 'Is this computation correct?' or 'Is this prediction accurate?', Dialectic asks the harder question: 'Is this thinking sound?'—and we answer it by paying people to try to prove it's not."**
+### Network Revenue
 
+Dialectic is a Bittensor subnet. Revenue flows through TAO emissions:
+
+| Source | Mechanism |
+|--------|-----------|
+| Block emissions | TAO distributed to subnet based on network weight |
+| Registration fees | New participants pay to register |
+| Stake lockups | Staked TAO provides network security |
+
+### External Revenue (Future)
+
+As the network matures, external revenue sources include:
+
+| Source | Mechanism |
+|--------|-----------|
+| Verification API | Pay-per-query for reasoning verification |
+| Enterprise integration | Custom domains, SLAs, private instances |
+| Certification | "Dialectic Verified" badge licensing |
+
+---
+
+## Network Effects
+
+### Supply Side
+
+More proposers → more reasoning to challenge → more challenger opportunity → more challengers → more adversarial pressure → higher quality → more proposers (quality attracts quality)
+
+### Demand Side
+
+More verified reasoning → more consumer trust → more demand → higher rewards → more participants
+
+### Data Effects
+
+More disputes → better calibration data → better validator scoring → fairer outcomes → more trust → more disputes
+
+---
+
+## Moat
+
+**1. Economic Security**
+- Staked TAO creates attack cost
+- Higher stake = harder to manipulate
+- Network effect compounds security
+
+**2. Reputation Data**
+- Historical performance is non-transferable
+- New entrants start from scratch
+- Incumbent advantage accumulates
+
+**3. Domain Expertise**
+- Specialized challengers develop expertise
+- Expertise is hard to replicate
+- Quality gap widens over time
+
+**4. Integration Lock-in**
+- Once integrated into governance/audit flows
+- Switching costs are high
+- Embedded in decision processes
+
+---
+
+## Risks and Mitigations
+
+| Risk | Mitigation |
+|------|------------|
+| Low initial liquidity | Bootstrap incentives, reduced stakes at launch |
+| Collusion | Statistical detection, reputation penalties |
+| Validator capture | Random assignment, multi-tier consensus |
+| Quality ceiling | Difficulty adjustment, domain expansion |
+| Regulatory | Focus on verification, not advice |
+</doc>
+
+---
