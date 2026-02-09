@@ -1,100 +1,253 @@
-# Validator Design: The Adjudication Layer
+# Validator Design
 
-## Scoring and Evaluation Methodology
-
-### Stochastic Branch Verification (SBV)
-
-Validators **do not** score full reasoning trees (computationally prohibitive). Instead, they employ **probabilistic verification**:
-
-*   **Randomized Depth Sampling**: When a challenge occurs at node *N*, validators randomly select *k* ancestral branches (where `k = log₂(tree depth)`) to verify **logical consistency** across the proof path.
-
-*   **Formal Logic Probes**: Deploy lightweight **SMT solvers** (Z3) for mathematical claims; use **NLI models** (Natural Language Inference) for semantic entailment in text-based reasoning.
-
-*   **Adversarial Cross-Examination**: Validators prompt miners with **follow-up questions** (*Q*) derived from challenged nodes; responses must maintain **logical equivalence** with the original submission under perturbation.
+Validators adjudicate disputes between Proposers and Challengers. This document covers the adjudication protocol, scoring, and validator tiers.
 
 ---
 
-#### The Scoring Function
+## Role Overview
 
-**`Validator_Score = (Calibration × 0.4) + (Efficiency × 0.3) + (Coverage × 0.3)`**
+Validators don't evaluate all reasoning — they judge contested claims when challenges arise. Their role is judicial, not editorial.
 
-Where:
-
-*   **Calibration** = `1 - |Your_Vote - Consensus_Result|`  
-    *Heavily penalized for being wrong when consensus is strong (>80%).*
-
-*   **Efficiency** = `1 / (Compute_Cost × Time_to_Verify)`  
-    *Faster verification with fewer LLM calls = **higher score**.*
-
-*   **Coverage** = `Unique_Branches_Verified / Total_Branches_Challenged`  
-    *Prevents validators from "cherry-picking" only easy, shallow nodes.*
-
-#### Consensus Mechanisms
-
-*   **Quadratic Voting**: Validators stake TAO per decision; stake weight follows **`√stake`** to prevent **whale dominance**.
-
-*   **Truth Latency Adjustment**: If a validator is "**early correct**" (votes correctly before the **67%** threshold is reached), they receive a **1.5x** emission multiplier for identifying truth *before* crowd consensus forms.
+**Validator responsibilities:**
+1. Adjudicate challenges fairly
+2. Maintain calibration (accuracy over time)
+3. Respond within time limits
+4. Stake to back their judgments
 
 ---
 
-## Evaluation Cadence
+## Adjudication Protocol
 
-### Phased Verification Windows
+### When a Challenge is Submitted
 
-*   **Preliminary Scan (Continuous)**: Validators run automated **coherence checks** (syntax validation, citation verification, basic logical fallacy detection) within **15 minutes** of submission. This filters obvious garbage before the challenge phase opens.
+    1. Challenge received → assigned to validator pool
+    2. Validators have 4 hours to review and vote
+    3. Weighted consensus determines outcome
+    4. Stakes redistributed based on verdict
 
-*   **Challenge Arbitration (Event-driven)**: When a challenge is lodged, validators enter a strict **4-hour adjudication window** to submit verdicts on disputed branches.
+### What Validators See
 
-*   **Settlement Epochs (Every 12 hours)**: **Batch processing** of all resolved debates; reward distribution and slashing applied **atomically**.
+    {
+      "dispute_id": "disp_20260209_1423",
+      "task_id": "dt_20260209_0847",
+      "contested_node": {
+        "id": "n1",
+        "claim": "Orbit chains have sufficient TVL to justify deployment costs",
+        "evidence": {
+          "source": "L2Beat",
+          "data": "Combined Orbit TVL: $2.1B as of Feb 2026"
+        }
+      },
+      "challenge": {
+        "attack_type": "factual_error",
+        "argument": "The L2Beat figure includes non-Orbit chains. Actual Orbit-only TVL is $340M.",
+        "evidence": {
+          "source": "L2Beat filtered view",
+          "data": "Orbit chains specifically: $340M combined"
+        }
+      },
+      "defense": {
+        "type": "refute",
+        "response": "The cited figure is correct. Here is the methodology..."
+      },
+      "proposer_reputation": 1.15,
+      "challenger_reputation": 0.95
+    }
 
-*   **Appeal Quorum (Weekly)**: The top **5%** most contested resolutions enter a **48-hour** secondary review by **high-reputation validators** (stake >**1,000 TAO**). These arbiters can overturn primary decisions with a **75% supermajority** *(prevents 51% validator collusion)*.
+Validators see the contested node, the challenge, and any defense — not the full tree.
 
-### Dynamic Evaluation Load
+### Validator Verdict
 
-*   Validators specify `max_concurrent_verifications` based on hardware constraints; the subnet automatically routes challenges to available validators using **consistent hashing** on `problem_id`.
+    {
+      "dispute_id": "disp_20260209_1423",
+      "verdict": "challenge_upheld",
+      "confidence": 0.85,
+      "reasoning": "Verified L2Beat source. Challenger's filtered view is accurate.",
+      "validator_hotkey": "5Vx7..."
+    }
 
-*   **Cooldown Period**: Validators **cannot** evaluate consecutive submissions from the same miner. This prevents gaming through validator-miner relationship building.
+**Verdict options:**
+- challenge_upheld — Challenger wins
+- challenge_rejected — Proposer wins
+- partial — Flaw exists but less severe than claimed
+- abstain — Insufficient information (costs reputation)
 
 ---
 
-## Validator Incentive Alignment
+## Consensus Mechanism
 
-### "Skin in the Game" Slashing Conditions
+### Weighted Voting
 
-*   **Consensus Divergence Penalty**: If a validator votes against the eventual majority—and that majority is **>80%** confident—the validator loses **5%** of staked TAO, distributed to validators who voted correctly.
+Each validator's vote is weighted by:
 
-*   **Lazy Validation Detection**: Validators who consistently vote "**Agree**" without submitting **verification traces** (ZK-proof of computation or signed API logs from LLM calls) receive **exponentially decaying rewards** (halving every epoch of lazy behavior).
+    weight = stake_weight × calibration_score × tier_multiplier
+    
+    Where:
+    - stake_weight = validator_stake / total_validator_stake
+    - calibration_score = historical accuracy (0.5 to 1.5)
+    - tier_multiplier = 1x (Scout), 2x (Auditor), 5x (Arbiter)
 
-*   **Challenge Collusion Resistance**: Validators who approve **>3 challenges** from the same challenger address within **24 hours** trigger "**Suspicion Mode**":
-    *   Their votes require **90%** consensus thresholds for **72 hours**.
-    *   Their rewards are **escrowed** pending manual review by the subnet owner.
+### Threshold
 
-### Long-term Alignment Mechanisms
+    If weighted_votes(challenge_upheld) > 0.6: Challenger wins
+    If weighted_votes(challenge_rejected) > 0.6: Proposer wins
+    If neither > 0.6: Escalate to Arbiter panel
 
-*   **Reputation Decay**: Validator effectiveness scores decay by **2% per day** of inactivity. This prevents "**sleeping giant**" validators from dominating emission history without current participation.
+### Escalation
 
-*   **Proportional Representation**: Emissions weighted by:  
-    **`stake × reputation_score × diversity_factor`**  
-    Where **diversity_factor** penalizes validators running identical models/configurations (ensures **decentralized verification methodologies**).
-
-*   **Treasury Alignment**: Top **10%** of validators (by accuracy) gain **governance rights** over subnet hyperparameters (e.g., challenge window duration, minimum stake thresholds), aligning them with **long-term subnet health** rather than short-term extraction.
+When consensus isn't reached:
+1. Dispute escalates to Arbiter-only panel
+2. Arbiters have 6 additional hours
+3. Simple majority among Arbiters decides
+4. Non-Arbiter validators who voted with eventual majority gain calibration; others lose
 
 ---
 
-## Validator Attraction Design
+## Validator Tiers
 
-### The Hardware Gradient
+| Tier | Stake Required | Max Cases/Epoch | Vote Weight | Requirements |
+|------|----------------|-----------------|-------------|--------------|
+| Scout | 100 TAO | 10 | 1x | None |
+| Auditor | 500 TAO | 50 | 2x | 30 days + 0.7 calibration |
+| Arbiter | 2,000 TAO | Unlimited | 5x | 90 days + 0.85 calibration |
 
-Three distinct validator tiers create a "**verification market**" where validators specialize based on capital/hardware, preventing centralization while ensuring every reasoning branch faces **economically-motivated scrutiny**:
+### Tier Progression
 
-1.  **Scouts**: Lightweight verification of shallow logic.  
-    *Rewards: **Lower** / Hardware: **Consumer GPUs** (accessible)*
+    Scout → Auditor: 
+      - 30 days active
+      - Calibration score ≥ 0.7
+      - ≥ 50 verdicts submitted
+      - Stake increased to 500 TAO
+    
+    Auditor → Arbiter:
+      - 90 days active  
+      - Calibration score ≥ 0.85
+      - ≥ 200 verdicts submitted
+      - Stake increased to 2,000 TAO
+      - No slashing events in past 60 days
 
-2.  **Auditors**: Deep verification utilizing heavy LLMs.  
-    *Rewards: **Higher** / Hardware: **A100s** (professional)*
+### Tier Demotion
 
-3.  **Arbiters**: Final appeal layer for contested resolutions.  
-    *Requirements: **Highest stake** / Rotation: **Monthly** (prevents stagnation)*
+Validators can be demoted for:
+- Calibration score dropping below tier threshold
+- Extended inactivity (>14 days without verdict)
+- Slashing event (immediate demotion one tier)
 
-**Result**: A decentralized verification marketplace where **economic rationality** enforces truth.
+---
 
+## Calibration Scoring
+
+Calibration measures how well a validator's verdicts align with final outcomes.
+
+### Calculation
+
+    calibration = (correct_verdicts × confidence_alignment) / total_verdicts
+    
+    Where:
+    - correct_verdict = voted with eventual consensus
+    - confidence_alignment = 1 - |stated_confidence - actual_outcome|
+
+**Example:**
+- Validator votes challenge_upheld with 0.85 confidence
+- Final outcome: challenge upheld (1.0)
+- Alignment: 1 - |0.85 - 1.0| = 0.85
+- This verdict scores 0.85
+
+### Calibration Decay
+
+- Calibration decays 2% per epoch without activity
+- Recent verdicts weighted more heavily (exponential decay, τ = 30 days)
+- New validators start at 1.0 (neutral)
+
+### Calibration Penalties
+
+| Calibration Score | Effect |
+|-------------------|--------|
+| > 1.2 | Bonus cases, priority assignment |
+| 1.0 - 1.2 | Normal operation |
+| 0.7 - 1.0 | Reduced case assignment |
+| 0.5 - 0.7 | Scout-only cases, tier demotion risk |
+| < 0.5 | Suspended from adjudication |
+
+---
+
+## Validator Rewards
+
+### Base Rewards
+
+Validators receive 10% of epoch emissions, distributed by:
+
+    validator_reward = base_emission × 0.1 × (validator_weight / total_validator_weight)
+    
+    validator_weight = stake × calibration × tier_multiplier × activity_bonus
+
+### Per-Dispute Rewards
+
+Additionally, validators earn per dispute:
+
+| Outcome | Reward |
+|---------|--------|
+| Voted with consensus | 0.5% of dispute stakes |
+| Voted against consensus | -0.25% of own stake |
+| Abstained | No reward, small calibration hit |
+
+### Activity Bonus
+
+    activity_bonus = min(1.5, 1.0 + (verdicts_this_epoch / expected_verdicts) × 0.5)
+
+Active validators earn up to 50% more than passive ones.
+
+---
+
+## Hardware Requirements
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| CPU | 4 cores | 8+ cores |
+| RAM | 16 GB | 32 GB |
+| GPU | Not required | Optional for analysis |
+| Storage | 100 GB SSD | 500 GB NVMe |
+| Network | 50 Mbps | 100 Mbps, low latency |
+
+Validators need:
+- Reliable uptime (disputes have time limits)
+- Fast evidence verification (web access)
+- Sufficient compute for analysis tooling
+
+---
+
+## Running a Validator
+
+    git clone https://github.com/MeaCulpitt/Dialectic-subnet.git
+    cd Dialectic-subnet
+    pip install -r requirements.txt
+    
+    python neurons/validator.py \
+      --netuid <NETUID> \
+      --wallet.name <WALLET> \
+      --wallet.hotkey <HOTKEY> \
+      --stake 100 \
+      --auto_verdict false
+
+### Configuration Options
+
+| Flag | Description | Default |
+|------|-------------|---------|
+| --stake | TAO to stake | 100 |
+| --auto_verdict | Use AI-assisted verdicts | false |
+| --domains | Limit to specific domains | all |
+| --max_cases | Cases per epoch | tier limit |
+| --response_hours | Time before auto-abstain | 4 |
+
+---
+
+## Best Practices
+
+1. **Verify evidence independently.** Don't trust either party's citations.
+2. **State confidence accurately.** Overconfidence hurts calibration.
+3. **Abstain when uncertain.** Better than a wrong verdict.
+4. **Specialize.** Focus on domains you understand.
+5. **Stay active.** Calibration decays with inactivity.
+6. **Read defenses carefully.** Proposers sometimes have valid rebuttals.
+
+---
