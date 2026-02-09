@@ -38,6 +38,103 @@ This creates a market for reasoning verification where truth-finding is incentiv
 
 ---
 
+## Who Are Our Customers?
+
+### Primary Customers: Proposers
+
+Proposers pay through stake-at-risk. They want verified reasoning for credibility.
+
+**DeFi Governance Contributors**
+- Compound, Aave, MakerDAO, Uniswap proposal authors
+- Currently: Write proposals, hope voters read them, face no penalty for bad reasoning
+- With Dialectic: Submit proposals as reasoning trees, stake TAO, earn "survived challenge" credibility
+- Why they pay: Proposals that survive adversarial review carry more weight in votes
+
+**Protocol Teams Pre-Vote**
+- Teams proposing major parameter changes, token migrations, or treasury allocations
+- Currently: Internal review, maybe forum discussion, then vote
+- With Dialectic: Formal adversarial review before vote, demonstrates rigor
+- Why they pay: Reduces governance attack surface, signals confidence
+
+**Security Teams Post-Audit**
+- Projects that paid $100k+ for a one-time audit
+- Currently: Audit report sits in a PDF, code evolves, assumptions break
+- With Dialectic: Continuous adversarial coverage on security reasoning
+- Why they pay: Audit is a snapshot; Dialectic is ongoing
+
+**Crypto Research Firms**
+- Messari, Delphi Digital, Galaxy Research, independent analysts
+- Currently: Publish investment theses with no immediate accountability
+- With Dialectic: Submit theses as reasoning trees, stake reputation
+- Why they pay: "Dialectic Verified" becomes credibility signal for subscribers
+
+**Token Projects Pre-Launch**
+- Teams designing tokenomics, emission schedules, incentive mechanisms
+- Currently: Internal review, maybe advisor feedback
+- With Dialectic: Adversarial stress-test before mainnet
+- Why they pay: Flawed tokenomics are expensive to fix post-launch
+
+### Secondary Customers: Consumers (Future API)
+
+Once "Dialectic Verified" means something, consumers pay to query verification status.
+
+**Voters in DAO Governance**
+- Check if a proposal survived adversarial review before voting
+- Pay per query or via subscription
+
+**Due Diligence Teams**
+- Funds, family offices, institutional investors
+- Query verification status of research memos, audit reasoning
+- Pay for API access + historical dispute data
+
+**Integration Partners**
+- Governance platforms (Snapshot, Tally) embed Dialectic status
+- Pay for API access + white-label verification badges
+
+---
+
+## Who Earns?
+
+### Challengers
+
+Security researchers, auditors, analysts who profit from finding flaws.
+
+**Current Bug Bounty Hunters**
+- Immunefi, HackerOne participants
+- Currently: Find code bugs, earn bounties
+- With Dialectic: Find reasoning flaws, earn challenge rewards
+- New venue: Expands from "is the code broken?" to "is the logic broken?"
+
+**Independent Analysts**
+- Crypto Twitter researchers, governance watchers
+- Currently: Post threads pointing out flaws, earn followers
+- With Dialectic: Post challenges, earn TAO
+- Monetization path: Turn analysis into income
+
+**Professional Adversaries**
+- Firms that specialize in red-teaming
+- Currently: Hired for one-off engagements
+- With Dialectic: Continuous earning from challenge pool
+- Business model: Adversarial review as a service
+
+### Validators
+
+Domain experts who adjudicate disputes.
+
+**Governance Specialists**
+- People who deeply understand DeFi protocol mechanics
+- Earn by accurately judging governance-related disputes
+
+**Security Experts**
+- Auditors, security researchers
+- Earn by adjudicating smart contract reasoning disputes
+
+**Legal/Compliance Professionals**
+- As Dialectic expands to legal domain
+- Earn by judging regulatory and contractual reasoning
+
+---
+
 ## Competitive Landscape
 
 ### vs. ZKML (EZKL, Modulus, Giza)
@@ -83,50 +180,6 @@ This creates a market for reasoning verification where truth-finding is incentiv
 | Cost | $50k-500k | Market-driven |
 
 **Relationship:** Competitive for some use cases, complementary for others. Audits provide depth; Dialectic provides breadth and speed.
-
----
-
-## Target Use Cases
-
-### Tier 1: Immediate Value
-
-**DeFi Governance**
-- Protocol proposals require structured justification
-- Challengers stress-test assumptions before votes
-- Reduces governance attacks and poorly-reasoned proposals
-- *Market size:* $50B+ in governed TVL
-
-**Smart Contract Security**
-- Audit reasoning submitted as trees
-- Economic incentive to find what auditors missed
-- Continuous post-deployment monitoring
-- *Market size:* $500M+ annual audit spend
-
-### Tier 2: Near-Term Expansion
-
-**Legal Analysis**
-- Contract interpretation with explicit logic
-- Adversarial review before execution
-- Regulatory compliance reasoning
-- *Market size:* Legal AI market $15B by 2027
-
-**Investment Research**
-- Structured investment theses
-- Adversarial due diligence
-- Track record verification
-- *Market size:* Research spend $30B+ annually
-
-### Tier 3: Long-Term Vision
-
-**Scientific Reasoning**
-- Pre-publication adversarial review
-- Replication crisis mitigation
-- Structured methodology verification
-
-**AI Alignment**
-- Verify AI reasoning chains
-- Adversarial testing of AI decisions
-- Human-AI collaboration verification
 
 ---
 
@@ -234,6 +287,5 @@ More disputes → better calibration data → better validator scoring → faire
 | Validator capture | Random assignment, multi-tier consensus |
 | Quality ceiling | Difficulty adjustment, domain expansion |
 | Regulatory | Focus on verification, not advice |
-</doc>
 
 ---
